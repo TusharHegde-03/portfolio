@@ -1,7 +1,7 @@
 # TUSHIRO — Immersive Futuristic Portfolio
 
-> Production-quality personal portfolio website for Tushiro (Tushar Hegde).
-> Computer Science Engineer | Data Engineer | AI Builder | Developer | Builder | Explorer
+> personal portfolio website for Tushiro (Tushar Hegde).
+> Information Science Engineer | Engineer | AI Builder | Developer | Explorer
 
 ---
 
