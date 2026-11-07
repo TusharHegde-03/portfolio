@@ -47,7 +47,7 @@ export const LightHero: React.FC<LightHeroProps> = ({ onScrollToProjects, onScro
           <div className="relative my-auto py-12 flex flex-col items-center justify-center min-h-[420px]">
             {/* Giant Background Typography: TUSHAR HEGDE */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center z-0 pointer-events-none select-none">
-              <div className="font-display text-[65px] sm:text-[110px] md:text-[150px] lg:text-[190px] font-extrabold tracking-tight leading-none uppercase flex justify-center items-center gap-2 sm:gap-6">
+              <div className="font-display text-[4.0625rem] sm:text-[6.875rem] md:text-[9.375rem] lg:text-[11.875rem] font-extrabold tracking-tight leading-none uppercase flex justify-center items-center gap-2 sm:gap-6">
                 {/* Outlined Stroke Text for "TUSHAR" */}
                 <span
                   className="inline-block text-transparent"
@@ -135,3 +135,4 @@ export const LightHero: React.FC<LightHeroProps> = ({ onScrollToProjects, onScro
     </section>
   );
 };
+

@@ -33,7 +33,7 @@ export const LightFooter: React.FC = () => {
               <Mail size={16} />
             </a>
           </div>
-          <div className="text-[10px] text-slate-500">
+          <div className="text-[0.625rem] text-slate-500">
             © {new Date().getFullYear()} {profileData.personName}. All rights reserved.
           </div>
         </div>
@@ -41,3 +41,4 @@ export const LightFooter: React.FC = () => {
     </footer>
   );
 };
+

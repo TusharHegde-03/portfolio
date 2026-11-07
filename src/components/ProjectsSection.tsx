@@ -64,7 +64,7 @@ export const ProjectsSection: React.FC = () => {
           <p className="mt-4 text-sm tracking-wide text-slate-200 md:text-lg">Built with curiosity. Powered by data. Designed for impact.</p>
         </div>
 
-        <div className="mb-4 flex items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.18em] text-cyan-100/80 md:text-xs">
+        <div className="mb-4 flex items-center justify-between gap-4 font-mono text-[0.625rem] uppercase tracking-[0.18em] text-cyan-100/80 md:text-xs">
           <span className="flex items-center gap-2"><span className={`h-2 w-2 rounded-full bg-cyan-300 ${isPaused ? '' : 'animate-pulse'}`} /> {isPaused ? 'ROTATION PAUSED' : 'AUTO-ROTATION ACTIVE'}</span>
           <span className="hidden items-center gap-2 sm:flex"><GripHorizontal size={15} /> HOVER TO PAUSE · DRAG TO ROTATE</span>
         </div>
@@ -77,7 +77,7 @@ export const ProjectsSection: React.FC = () => {
               const distance = circularDistance(index, activeIndex);
               const depth = Math.abs(distance);
               return <motion.article key={project.id} className="project-card project-carousel__card" animate={{ x: distance * 390, y: -depth * 34, z: -depth * 45, rotateY: distance * -9, scale: depth === 0 ? 1 : depth === 1 ? 0.96 : 0.84, opacity: depth === 2 ? 0.58 : 1 }} transition={{ duration: 0.82, ease: [0.22, 1, 0.36, 1] }} style={{ zIndex: 10 - depth }} onClick={() => { if (!dragged.current) setSelectedProject(project); }} role="button" tabIndex={0} onKeyDown={(event) => event.key === 'Enter' && setSelectedProject(project)} aria-label={`Preview ${project.title}`}>
-                <div className="project-card__titlebar"><div><div className="mb-2 flex items-center justify-between gap-3"><span className="font-mono text-[10px] tracking-[0.16em] text-cyan-300">SYS // {project.id}</span><Terminal size={15} className="text-cyan-300" /></div><h3 className="font-display text-xl font-bold leading-tight text-white md:text-2xl">{project.title}</h3></div><p className="mt-4 font-mono text-[11px] tracking-wide text-cyan-100/90">{project.techDisplay}</p></div>
+                <div className="project-card__titlebar"><div><div className="mb-2 flex items-center justify-between gap-3"><span className="font-mono text-[0.625rem] tracking-[0.16em] text-cyan-300">SYS // {project.id}</span><Terminal size={15} className="text-cyan-300" /></div><h3 className="font-display text-xl font-bold leading-tight text-white md:text-2xl">{project.title}</h3></div><p className="mt-4 font-mono text-[0.6875rem] tracking-wide text-cyan-100/90">{project.techDisplay}</p></div>
                 <div className="project-card__visual" style={{ backgroundImage: `url('${project.image}')`, backgroundPosition: project.bgPosition }}><div className="project-card__scanlines" /><div className="project-card__visual-label">{project.tagline}</div></div>
                 <div className="project-card__footer"><button type="button" onClick={(event) => { event.stopPropagation(); setSelectedProject(project); }} className="project-card__preview">VIEW PROJECT <Maximize2 size={13} /></button><ArrowRight size={14} /></div>
               </motion.article>;
@@ -90,9 +90,10 @@ export const ProjectsSection: React.FC = () => {
           {projectsData.map((project, index) => <button key={project.id} type="button" onClick={() => moveTo(index)} className={`project-carousel__dot ${activeIndex === index ? 'is-active' : ''}`} aria-label={`Show project ${index + 1}: ${project.title}`} aria-current={activeIndex === index ? 'true' : undefined} />)}
           <button type="button" onClick={() => moveTo(activeIndex + 1)} className="project-carousel__control" aria-label="Show next project"><ArrowRight size={18} /></button>
         </div>
-        <div className="mt-5 flex items-center justify-center gap-4 font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-100/80 md:text-xs"><div className="h-px w-10 bg-cyan-300" /><span>Drag, hover, or use controls to explore · Click a card to preview</span><div className="h-px w-10 bg-cyan-300" /></div>
+        <div className="mt-5 flex items-center justify-center gap-4 font-mono text-[0.625rem] uppercase tracking-[0.2em] text-cyan-100/80 md:text-xs"><div className="h-px w-10 bg-cyan-300" /><span>Drag, hover, or use controls to explore · Click a card to preview</span><div className="h-px w-10 bg-cyan-300" /></div>
       </div>
       <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
     </section>
   );
 };
+

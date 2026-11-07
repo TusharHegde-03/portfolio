@@ -1,132 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import { CustomCursor } from './components/CustomCursor';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { LoadingScreen } from './components/LoadingScreen';
-import { Navigation } from './components/Navigation';
 
-// Dark Tushiro Cyberpunk Components (Original - UNTOUCHED)
-import { HeroScene } from './components/HeroScene';
-import { JourneySection } from './components/JourneySection';
-import { ProjectsSection } from './components/ProjectsSection';
-import { SkillsSection } from './components/SkillsSection';
-import { AboutSection } from './components/AboutSection';
-import { ContactForm } from './components/ContactForm';
-import { Footer } from './components/Footer';
+const Navigation = lazy(() => import('./components/Navigation').then(module => ({ default: module.Navigation })));
+const LightHero = lazy(() => import('./components/light/LightHero').then(module => ({ default: module.LightHero })));
+const LightProjects = lazy(() => import('./components/light/LightProjects').then(module => ({ default: module.LightProjects })));
+const LightAboutSkills = lazy(() => import('./components/light/LightAboutSkills').then(module => ({ default: module.LightAboutSkills })));
+const LightContact = lazy(() => import('./components/light/LightContact').then(module => ({ default: module.LightContact })));
+const LightFooter = lazy(() => import('./components/light/LightFooter').then(module => ({ default: module.LightFooter })));
+const DarkPortfolio = lazy(() => import('./DarkPortfolio').then(module => ({ default: module.DarkPortfolio })));
 
-// Light Tushar Minimal Professional Components (NEW)
-import { LightHero } from './components/light/LightHero';
-import { LightProjects } from './components/light/LightProjects';
-import { LightAboutSkills } from './components/light/LightAboutSkills';
-import { LightContact } from './components/light/LightContact';
-import { LightFooter } from './components/light/LightFooter';
+type ThemeMode = 'dark-tushiro' | 'light-tushar';
 
 export const App: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [themeMode, setThemeMode] = useState<'dark-tushiro' | 'light-tushar'>(() => {
-    const saved = localStorage.getItem('tushiro_theme_mode');
-    return saved === 'light-tushar' ? 'light-tushar' : 'dark-tushiro';
+  const [isChoosingTheme, setIsChoosingTheme] = useState(true);
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    return localStorage.getItem('tushiro_theme_mode') === 'light-tushar' ? 'light-tushar' : 'dark-tushiro';
   });
-  const [activeSection, setActiveSection] = useState('hero');
+  const [activeSection, setActiveSection] = useState('top');
 
-  const handleSelectMode = (mode: 'dark-tushiro' | 'light-tushar') => {
+  const selectMode = (mode: ThemeMode) => {
     setThemeMode(mode);
     localStorage.setItem('tushiro_theme_mode', mode);
-    setIsLoading(false);
+    setIsChoosingTheme(false);
+    window.scrollTo({ top: 0 });
   };
-
-  const toggleThemeMode = () => {
-    const newMode = themeMode === 'dark-tushiro' ? 'light-tushar' : 'dark-tushiro';
-    setThemeMode(newMode);
-    localStorage.setItem('tushiro_theme_mode', newMode);
-  };
-
-  // Smooth scroll handler
-  const scrollToSection = (sectionId: string) => {
-    setActiveSection(sectionId);
-    if (sectionId === 'hero' || sectionId === 'top') {
+  const toggleMode = () => selectMode(themeMode === 'dark-tushiro' ? 'light-tushar' : 'dark-tushiro');
+  const navigate = (id: string) => {
+    setActiveSection(id);
+    if (id === 'top' || id === 'hero') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    const elem = document.getElementById(sectionId);
-    if (elem) {
-      elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  // ScrollSpy to update active section link automatically as user scrolls
   useEffect(() => {
-    const handleScroll = () => {
-      const darkSections = ['hero', 'work', 'journey', 'skills', 'resume', 'contact'];
-      const lightSections = ['light-work', 'light-about', 'light-contact'];
-      const sections = themeMode === 'dark-tushiro' ? darkSections : lightSections;
-      const scrollPos = window.scrollY + 200;
-
-      for (const section of sections) {
-        const elem = document.getElementById(section);
-        if (elem) {
-          const top = elem.offsetTop;
-          const height = elem.offsetHeight;
-          if (scrollPos >= top && scrollPos < top + height) {
-            setActiveSection(section === 'about' ? 'skills' : section);
-            break;
-          }
+    const sections = themeMode === 'dark-tushiro' ? ['top', 'work', 'journey', 'skills', 'about', 'contact'] : ['light-work', 'light-about', 'light-contact'];
+    const onScroll = () => {
+      const scrollY = window.scrollY + 180;
+      for (const id of sections) {
+        const section = document.getElementById(id);
+        if (section && scrollY >= section.offsetTop && scrollY < section.offsetTop + section.offsetHeight) {
+          setActiveSection(id);
+          return;
         }
       }
     };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, [themeMode]);
 
-  return (
-    <div
-      className={`min-h-screen relative selection:bg-cyan-500 selection:text-black ${
-        themeMode === 'dark-tushiro' ? 'bg-[#050a14] text-white' : 'bg-slate-50 text-slate-900'
-      }`}
-    >
-      {/* Initial Mode Choice Selection Loading Overlay */}
-      {isLoading && <LoadingScreen onSelectMode={handleSelectMode} />}
-
-      {/* Custom Desktop Cursor (Dark Mode Only) */}
-      {themeMode === 'dark-tushiro' && <CustomCursor />}
-
-      {/* Navigation Header with Mode Toggle Switcher */}
-      <Navigation
-        activeSection={activeSection}
-        onNavigate={scrollToSection}
-        themeMode={themeMode}
-        onToggleThemeMode={toggleThemeMode}
-      />
-
-      {/* Main Page Content */}
+  return <div className={themeMode === 'dark-tushiro' ? 'min-h-screen dark-experience' : 'min-h-screen light-experience'}>
+    {isChoosingTheme && <LoadingScreen onSelectMode={selectMode} />}
+    <Suspense fallback={<div className="experience-loading" aria-label="Loading portfolio" />}>
+    {themeMode === 'dark-tushiro' ? <>
+      <DarkPortfolio onToggleTheme={toggleMode} />
+    </> : <>
+      <Navigation activeSection={activeSection} onNavigate={navigate} themeMode={themeMode} onToggleThemeMode={toggleMode} />
       <main className="relative z-10">
-        {themeMode === 'dark-tushiro' ? (
-          /* MODE A: Dark Cyberpunk Tushiro Version (Fully Intact & Preserved) */
-          <>
-            <HeroScene onScrollClick={() => scrollToSection('work')} />
-            <ProjectsSection />
-            <JourneySection />
-            <SkillsSection />
-            <AboutSection />
-            <ContactForm />
-          </>
-        ) : (
-          /* MODE B: Light Minimal Professional Tushar Hegde Version (Student & IS Engineer) */
-          <>
-            <LightHero
-              onScrollToProjects={() => scrollToSection('light-work')}
-              onScrollToContact={() => scrollToSection('light-contact')}
-            />
-            <LightProjects />
-            <LightAboutSkills />
-            <LightContact />
-          </>
-        )}
+        <LightHero onScrollToProjects={() => navigate('light-work')} onScrollToContact={() => navigate('light-contact')} />
+        <LightProjects />
+        <LightAboutSkills />
+        <LightContact />
       </main>
-
-      {/* Footer */}
-      {themeMode === 'dark-tushiro' ? <Footer /> : <LightFooter />}
-    </div>
-  );
+      <LightFooter />
+    </>}
+    </Suspense>
+  </div>;
 };
 
 export default App;

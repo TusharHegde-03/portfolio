@@ -85,14 +85,14 @@ export const LightAboutSkills: React.FC = () => {
                 >
                   <div className="mb-2">{getIcon(skill.iconName)}</div>
                   <div className="font-display text-xs font-bold text-slate-900">{skill.name}</div>
-                  <div className="font-mono text-[10px] text-slate-500 mt-0.5">{skill.category}</div>
+                  <div className="font-mono text-xs text-slate-500 mt-0.5">{skill.category}</div>
                 </div>
               ))}
             </div>
 
             {/* Code Snippet Inspector Box */}
             <div className="bg-slate-900 rounded-2xl p-6 font-mono text-xs text-cyan-300 shadow-xl border border-slate-800">
-              <div className="text-[10px] text-slate-400 mb-3 border-b border-slate-800 pb-2 flex justify-between items-center">
+              <div className="text-[0.6875rem] text-slate-400 mb-3 border-b border-slate-800 pb-2 flex justify-between items-center">
                 <span>SYSTEM SPECIFICATION // FRESH GRADUATE ENGINEER</span>
                 <span className="text-emerald-400 font-bold">STATUS: READY FOR WORK</span>
               </div>
@@ -115,3 +115,5 @@ async def profile():
     </section>
   );
 };
+
+
