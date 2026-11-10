@@ -80,11 +80,11 @@ function PortraitStory({ onSeeWork }: { onSeeWork: () => void }) {
     if (!storyRef.current || !stageRef.current) return;
     const mm = gsap.matchMedia(storyRef);
 
-    mm.add('(min-width: 721px)', () => {
-      // Explicitly initialise the two side panels to their hidden state so GSAP owns the values
-      // and no CSS/revert race can make them flash visible before the scroll reaches them.
-      gsap.set('.hero-scroll-left', { autoAlpha: 0, x: -55 });
-      gsap.set('.hero-scroll-bio',  { autoAlpha: 0, x:  65 });
+    mm.add('(all)', () => {
+      // Explicitly initialise states so GSAP controls them cleanly across all devices
+      gsap.set('.hero-scroll-left', { autoAlpha: 0, x: -45 });
+      gsap.set('.hero-scroll-bio',  { autoAlpha: 0, x:  45 });
+      gsap.set('.hero-cutout-mood', { autoAlpha: 1 });
       gsap.set('.hero-cutout-thoughtful', { autoAlpha: 0 });
       gsap.set('.hero-hotspots', { autoAlpha: 0 });
 
@@ -103,22 +103,10 @@ function PortraitStory({ onSeeWork }: { onSeeWork: () => void }) {
         .to('.hero-cutout-mood', { autoAlpha: 0, scale: .94, ease: 'none' }, .2)
         .fromTo('.hero-cutout-thoughtful', { autoAlpha: 0, scale: .92 }, { autoAlpha: 1, scale: 1, ease: 'none' }, .2)
         .fromTo('.hero-hotspots', { autoAlpha: 0 }, { autoAlpha: 1, ease: 'none' }, .3)
-        .to('.hero-portrait-layer', { x: '-12vw', scale: 1.2, ease: 'none' }, .48)
+        .to('.hero-portrait-layer', { x: '-8vw', scale: 1.15, ease: 'none' }, .48)
         .to('.hero-hotspots', { autoAlpha: 0, ease: 'none' }, .44)
         .to('.hero-scroll-left', { x: 0, autoAlpha: 1, ease: 'none' }, .5)
         .to('.hero-scroll-bio', { x: 0, autoAlpha: 1, ease: 'none' }, .64);
-    });
-
-    mm.add('(max-width: 720px)', () => {
-      // On mobile the hero is laid out as a normal flow column.
-      // Force all elements visible/reset with inline styles so CSS overrides
-      // from the @media (max-width: 720px) block can take full effect.
-      gsap.set('.hero-scroll-left', { autoAlpha: 1, x: 0 });
-      gsap.set('.hero-scroll-bio',  { autoAlpha: 1, x: 0 });
-      gsap.set('.hero-cutout-thoughtful', { autoAlpha: 1 });
-      gsap.set('.hero-cutout-mood', { autoAlpha: 0 });
-      gsap.set('.hero-hotspots', { autoAlpha: 0 });
-      gsap.set(['.hero-name-back', '.hero-portrait-layer', '.hero-lede'], { clearProps: 'all' });
     });
 
     return () => mm.revert();
@@ -202,21 +190,12 @@ function InteractiveProjectImage({ project, index }: { project: Project; index: 
 export function ProjectShowcase({ projects, onOpen, reducedMotion, theme = 'dark' }: { projects: Project[]; onOpen: (project: Project) => void; reducedMotion: boolean; theme?: 'dark' | 'light' }) {
   const trackRef = useRef<HTMLElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 720);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 720px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    setIsMobile(mq.matches);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   useGSAP(() => {
     if (!trackRef.current || !frameRef.current) return;
     const mm = gsap.matchMedia(trackRef);
 
-    mm.add('(min-width: 721px)', () => {
+    mm.add('(all)', () => {
       const panels = gsap.utils.toArray<HTMLElement>('.project-slide', trackRef.current);
       gsap.set(panels, { autoAlpha: 0 });
       const timeline = gsap.timeline({
@@ -238,22 +217,10 @@ export function ProjectShowcase({ projects, onOpen, reducedMotion, theme = 'dark
       });
     });
 
-    mm.add('(max-width: 720px)', () => {
-      const panels = gsap.utils.toArray<HTMLElement>('.project-slide', trackRef.current);
-      // Make every panel and its contents fully visible — CSS handles the stacked layout.
-      gsap.set(panels, { autoAlpha: 1, clearProps: 'transform' });
-      panels.forEach(panel => {
-        const circle = panel.querySelector('.project-circle-trigger');
-        if (circle) gsap.set(circle, { scale: 1, clearProps: 'transform' });
-        const story = panel.querySelector('.project-story');
-        if (story) gsap.set(story, { autoAlpha: 1, x: 0, clearProps: 'transform' });
-      });
-    });
-
     return () => mm.revert();
-  }, { scope: trackRef, dependencies: [projects, reducedMotion], revertOnUpdate: true });
+  }, { scope: trackRef, dependencies: [projects], revertOnUpdate: true });
 
-  return <section ref={trackRef} style={isMobile ? undefined : { height: `${(Math.max(1, projects.length) + 1) * 100}svh` }} className={`project-showcase${reducedMotion ? ' reduce-motion' : ''}${theme === 'light' ? ' project-showcase-light' : ''}`} aria-label="Selected projects">
+  return <section ref={trackRef} style={{ height: `${(Math.max(1, projects.length) + 1) * 100}svh` }} className={`project-showcase${theme === 'light' ? ' project-showcase-light' : ''}`} aria-label="Selected projects">
     <div ref={frameRef} className="project-showcase-frame">
       {projects.map((project, index) => <article key={project.id} className={`project-slide project-slide-${index + 1}`} aria-label={project.title}>
         <InteractiveProjectImage project={project} index={index} />
