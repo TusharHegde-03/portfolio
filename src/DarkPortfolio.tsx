@@ -81,6 +81,13 @@ function PortraitStory({ onSeeWork }: { onSeeWork: () => void }) {
     const mm = gsap.matchMedia(storyRef);
 
     mm.add('(min-width: 721px)', () => {
+      // Explicitly initialise the two side panels to their hidden state so GSAP owns the values
+      // and no CSS/revert race can make them flash visible before the scroll reaches them.
+      gsap.set('.hero-scroll-left', { autoAlpha: 0, x: -55 });
+      gsap.set('.hero-scroll-bio',  { autoAlpha: 0, x:  65 });
+      gsap.set('.hero-cutout-thoughtful', { autoAlpha: 0 });
+      gsap.set('.hero-hotspots', { autoAlpha: 0 });
+
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: storyRef.current,
@@ -103,9 +110,15 @@ function PortraitStory({ onSeeWork }: { onSeeWork: () => void }) {
     });
 
     mm.add('(max-width: 720px)', () => {
-      gsap.set(['.hero-name-back', '.hero-portrait-layer', '.hero-lede', '.hero-scroll-left', '.hero-scroll-bio'], {
-        clearProps: 'all',
-      });
+      // On mobile the hero is laid out as a normal flow column.
+      // Force all elements visible/reset with inline styles so CSS overrides
+      // from the @media (max-width: 720px) block can take full effect.
+      gsap.set('.hero-scroll-left', { autoAlpha: 1, x: 0 });
+      gsap.set('.hero-scroll-bio',  { autoAlpha: 1, x: 0 });
+      gsap.set('.hero-cutout-thoughtful', { autoAlpha: 1 });
+      gsap.set('.hero-cutout-mood', { autoAlpha: 0 });
+      gsap.set('.hero-hotspots', { autoAlpha: 0 });
+      gsap.set(['.hero-name-back', '.hero-portrait-layer', '.hero-lede'], { clearProps: 'all' });
     });
 
     return () => mm.revert();
@@ -189,6 +202,15 @@ function InteractiveProjectImage({ project, index }: { project: Project; index: 
 export function ProjectShowcase({ projects, onOpen, reducedMotion, theme = 'dark' }: { projects: Project[]; onOpen: (project: Project) => void; reducedMotion: boolean; theme?: 'dark' | 'light' }) {
   const trackRef = useRef<HTMLElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 720);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 720px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    setIsMobile(mq.matches);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   useGSAP(() => {
     if (!trackRef.current || !frameRef.current) return;
@@ -218,19 +240,20 @@ export function ProjectShowcase({ projects, onOpen, reducedMotion, theme = 'dark
 
     mm.add('(max-width: 720px)', () => {
       const panels = gsap.utils.toArray<HTMLElement>('.project-slide', trackRef.current);
+      // Make every panel and its contents fully visible — CSS handles the stacked layout.
       gsap.set(panels, { autoAlpha: 1, clearProps: 'transform' });
       panels.forEach(panel => {
         const circle = panel.querySelector('.project-circle-trigger');
         if (circle) gsap.set(circle, { scale: 1, clearProps: 'transform' });
         const story = panel.querySelector('.project-story');
-        if (story) gsap.set(story, { autoAlpha: 1, clearProps: 'transform' });
+        if (story) gsap.set(story, { autoAlpha: 1, x: 0, clearProps: 'transform' });
       });
     });
 
     return () => mm.revert();
   }, { scope: trackRef, dependencies: [projects, reducedMotion], revertOnUpdate: true });
 
-  return <section ref={trackRef} style={{ height: `${(Math.max(1, projects.length) + 1) * 100}svh` }} className={`project-showcase${reducedMotion ? ' reduce-motion' : ''}${theme === 'light' ? ' project-showcase-light' : ''}`} aria-label="Selected projects">
+  return <section ref={trackRef} style={isMobile ? undefined : { height: `${(Math.max(1, projects.length) + 1) * 100}svh` }} className={`project-showcase${reducedMotion ? ' reduce-motion' : ''}${theme === 'light' ? ' project-showcase-light' : ''}`} aria-label="Selected projects">
     <div ref={frameRef} className="project-showcase-frame">
       {projects.map((project, index) => <article key={project.id} className={`project-slide project-slide-${index + 1}`} aria-label={project.title}>
         <InteractiveProjectImage project={project} index={index} />
@@ -307,7 +330,10 @@ export const DarkPortfolio: React.FC<{ onToggleTheme: () => void }> = ({ onToggl
       });
     }
     const timer = setTimeout(() => ScrollTrigger.refresh(), 600);
-    return () => clearTimeout(timer);
+    // Also refresh on orientation/resize so sticky offsets are correct
+    const onResize = () => ScrollTrigger.refresh();
+    window.addEventListener('resize', onResize, { passive: true });
+    return () => { clearTimeout(timer); window.removeEventListener('resize', onResize); };
   }, []);
 
   useEffect(() => {
