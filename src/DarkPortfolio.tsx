@@ -78,38 +78,33 @@ function PortraitStory({ onSeeWork }: { onSeeWork: () => void }) {
 
   useGSAP(() => {
     if (!storyRef.current || !stageRef.current) return;
-    const mm = gsap.matchMedia(storyRef);
 
-    mm.add('(all)', () => {
-      // Explicitly initialise states so GSAP controls them cleanly across all devices
-      gsap.set('.hero-scroll-left', { autoAlpha: 0, x: -45 });
-      gsap.set('.hero-scroll-bio',  { autoAlpha: 0, x:  45 });
-      gsap.set('.hero-cutout-mood', { autoAlpha: 1 });
-      gsap.set('.hero-cutout-thoughtful', { autoAlpha: 0 });
-      gsap.set('.hero-hotspots', { autoAlpha: 0 });
+    // Explicitly initialise states so GSAP controls them cleanly across all devices
+    gsap.set('.hero-scroll-left', { autoAlpha: 0, x: -45 });
+    gsap.set('.hero-scroll-bio',  { autoAlpha: 0, x:  45 });
+    gsap.set('.hero-cutout-mood', { autoAlpha: 1 });
+    gsap.set('.hero-cutout-thoughtful', { autoAlpha: 0 });
+    gsap.set('.hero-hotspots', { autoAlpha: 0 });
 
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: storyRef.current,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 1,
-          invalidateOnRefresh: true,
-        },
-      });
-      timeline
-        .to('.hero-name-back', { yPercent: -22, scale: .9, autoAlpha: .15, ease: 'none' }, 0)
-        .to('.hero-lede', { x: '-5vw', autoAlpha: 0, ease: 'none' }, .08)
-        .to('.hero-cutout-mood', { autoAlpha: 0, scale: .94, ease: 'none' }, .2)
-        .fromTo('.hero-cutout-thoughtful', { autoAlpha: 0, scale: .92 }, { autoAlpha: 1, scale: 1, ease: 'none' }, .2)
-        .fromTo('.hero-hotspots', { autoAlpha: 0 }, { autoAlpha: 1, ease: 'none' }, .3)
-        .to('.hero-portrait-layer', { x: '-8vw', scale: 1.15, ease: 'none' }, .48)
-        .to('.hero-hotspots', { autoAlpha: 0, ease: 'none' }, .44)
-        .to('.hero-scroll-left', { x: 0, autoAlpha: 1, ease: 'none' }, .5)
-        .to('.hero-scroll-bio', { x: 0, autoAlpha: 1, ease: 'none' }, .64);
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: storyRef.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1,
+        invalidateOnRefresh: true,
+      },
     });
-
-    return () => mm.revert();
+    timeline
+      .to('.hero-name-back', { yPercent: -22, scale: .9, autoAlpha: .15, ease: 'none' }, 0)
+      .to('.hero-lede', { x: '-5vw', autoAlpha: 0, ease: 'none' }, .08)
+      .to('.hero-cutout-mood', { autoAlpha: 0, scale: .94, ease: 'none' }, .2)
+      .fromTo('.hero-cutout-thoughtful', { autoAlpha: 0, scale: .92 }, { autoAlpha: 1, scale: 1, ease: 'none' }, .2)
+      .fromTo('.hero-hotspots', { autoAlpha: 0 }, { autoAlpha: 1, ease: 'none' }, .3)
+      .to('.hero-portrait-layer', { x: '-8vw', scale: 1.15, ease: 'none' }, .48)
+      .to('.hero-hotspots', { autoAlpha: 0, ease: 'none' }, .44)
+      .to('.hero-scroll-left', { x: 0, autoAlpha: 1, ease: 'none' }, .5)
+      .to('.hero-scroll-bio', { x: 0, autoAlpha: 1, ease: 'none' }, .64);
   }, { scope: storyRef, revertOnUpdate: true });
 
   return <section ref={storyRef} className="hero-scroll" id="top" aria-label="Introduction to Tushar Hegde">
@@ -193,31 +188,37 @@ export function ProjectShowcase({ projects, onOpen, reducedMotion, theme = 'dark
 
   useGSAP(() => {
     if (!trackRef.current || !frameRef.current) return;
-    const mm = gsap.matchMedia(trackRef);
 
-    mm.add('(all)', () => {
-      const panels = gsap.utils.toArray<HTMLElement>('.project-slide', trackRef.current);
-      gsap.set(panels, { autoAlpha: 0 });
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: trackRef.current,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 1,
-          invalidateOnRefresh: true,
-        },
-      });
-      panels.forEach((panel, index) => {
-        const circle = panel.querySelector('.project-circle-trigger') as HTMLElement;
-        const story = panel.querySelector('.project-story') as HTMLElement;
-        timeline.set(panel, { autoAlpha: 1 }, index);
-        timeline.fromTo(circle, { scale: .002 }, { scale: 1, duration: .72, ease: 'none' }, index);
-        timeline.fromTo(story, { x: -46, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: .28, ease: 'power2.out' }, index + .24);
-        if (index < panels.length - 1) timeline.to(panel, { autoAlpha: 0, duration: .09, ease: 'none' }, index + .93);
-      });
+    const panels = gsap.utils.toArray<HTMLElement>('.project-slide', trackRef.current);
+    if (!panels.length) return;
+
+    // First panel is initially visible so there is NEVER an empty black screen!
+    gsap.set(panels[0], { autoAlpha: 1 });
+    if (panels.length > 1) {
+      gsap.set(panels.slice(1), { autoAlpha: 0 });
+    }
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: trackRef.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1,
+        invalidateOnRefresh: true,
+      },
     });
 
-    return () => mm.revert();
+    panels.forEach((panel, index) => {
+      const circle = panel.querySelector('.project-circle-trigger') as HTMLElement;
+      const story = panel.querySelector('.project-story') as HTMLElement;
+
+      timeline.set(panel, { autoAlpha: 1 }, index);
+      timeline.fromTo(circle, { scale: .002 }, { scale: 1, duration: .72, ease: 'none' }, index);
+      timeline.fromTo(story, { x: -46, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: .28, ease: 'power2.out' }, index + .24);
+      if (index < panels.length - 1) {
+        timeline.to(panel, { autoAlpha: 0, duration: .09, ease: 'none' }, index + .93);
+      }
+    });
   }, { scope: trackRef, dependencies: [projects], revertOnUpdate: true });
 
   return <section ref={trackRef} style={{ height: `${(Math.max(1, projects.length) + 1) * 100}svh` }} className={`project-showcase${theme === 'light' ? ' project-showcase-light' : ''}`} aria-label="Selected projects">
