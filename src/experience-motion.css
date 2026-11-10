@@ -333,7 +333,7 @@
   .annotation-label { font-size: 0.9375rem; }
   .annotation-note { font-size: 0.625rem; }
   .portfolio-shell .hero-bottomline { position: relative; right: auto; bottom: auto; left: auto; margin-top: 25px; font-size: 0.5625rem; }
-  .portfolio-shell .work-intro { min-height: 45svh; align-items: stretch; padding: 60px 22px 28px; text-align: left; }
+  .portfolio-shell .work-intro { min-height: auto; align-items: stretch; padding: 60px 22px 28px; text-align: left; }
   .portfolio-shell .work-intro .eyebrow { margin-bottom: 20px; }
   .portfolio-shell .work-intro h2 { font-size: clamp(4rem,16vw,7rem); }
   .portfolio-shell .work-intro-copy { max-width: 310px; margin-left: auto; font-size: 0.625rem; }
