@@ -20,7 +20,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onSelectMode }) =>
     setPicked(mode);
     setCrackProgress(1);
     setLeaving(true);
-    window.setTimeout(() => onSelectMode(mode), reduceMotion ? 0 : 1180);
+    window.setTimeout(() => onSelectMode(mode), reduceMotion ? 350 : 1180);
   };
   const trackCrack = (event: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;

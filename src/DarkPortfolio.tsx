@@ -78,35 +78,48 @@ function PortraitStory({ onSeeWork }: { onSeeWork: () => void }) {
 
   useGSAP(() => {
     if (!storyRef.current || !stageRef.current) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce), (max-width: 720px)').matches) return;
-    const timeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: storyRef.current,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 1,
-      },
+    const mm = gsap.matchMedia(storyRef);
+
+    mm.add('(min-width: 721px) and (prefers-reduced-motion: no-preference)', () => {
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: storyRef.current,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+      timeline
+        .to('.hero-name-back', { yPercent: -22, scale: .9, autoAlpha: .15, ease: 'none' }, 0)
+        .to('.hero-lede', { x: '-5vw', autoAlpha: 0, ease: 'none' }, .08)
+        .to('.hero-cutout-mood', { autoAlpha: 0, scale: .94, ease: 'none' }, .2)
+        .fromTo('.hero-cutout-thoughtful', { autoAlpha: 0, scale: .92 }, { autoAlpha: 1, scale: 1, ease: 'none' }, .2)
+        .fromTo('.hero-hotspots', { autoAlpha: 0 }, { autoAlpha: 1, ease: 'none' }, .3)
+        .to('.hero-portrait-layer', { x: '-12vw', scale: 1.2, ease: 'none' }, .48)
+        .to('.hero-hotspots', { autoAlpha: 0, ease: 'none' }, .44)
+        .to('.hero-scroll-left', { x: 0, autoAlpha: 1, ease: 'none' }, .5)
+        .to('.hero-scroll-bio', { x: 0, autoAlpha: 1, ease: 'none' }, .64);
     });
-    timeline
-      .to('.hero-name-back', { yPercent: -22, scale: .9, autoAlpha: .15, ease: 'none' }, 0)
-      .to('.hero-lede', { x: '-5vw', autoAlpha: 0, ease: 'none' }, .08)
-      .to('.hero-cutout-mood', { autoAlpha: 0, scale: .94, ease: 'none' }, .2)
-      .fromTo('.hero-cutout-thoughtful', { autoAlpha: 0, scale: .92 }, { autoAlpha: 1, scale: 1, ease: 'none' }, .2)
-      .fromTo('.hero-hotspots', { autoAlpha: 0 }, { autoAlpha: 1, ease: 'none' }, .3)
-      .to('.hero-portrait-layer', { x: '-12vw', scale: 1.2, ease: 'none' }, .48)
-      .to('.hero-hotspots', { autoAlpha: 0, ease: 'none' }, .44)
-      .to('.hero-scroll-left', { x: 0, autoAlpha: 1, ease: 'none' }, .5)
-      .to('.hero-scroll-bio', { x: 0, autoAlpha: 1, ease: 'none' }, .64);
-  }, { scope: storyRef, dependencies: [], revertOnUpdate: true });
+
+    mm.add('(max-width: 720px), (prefers-reduced-motion: reduce)', () => {
+      gsap.set(['.hero-scroll-left', '.hero-scroll-bio', '.hero-hotspots', '.hero-cutout-thoughtful'], {
+        autoAlpha: 1,
+        clearProps: 'transform',
+      });
+    });
+
+    return () => mm.revert();
+  }, { scope: storyRef, revertOnUpdate: true });
 
   return <section ref={storyRef} className="hero-scroll" id="top" aria-label="Introduction to Tushar Hegde">
     <div ref={stageRef} className="hero-stage">
       <div className="hero-topline"><span><i /> ENGINEER / AI BUILDER</span><span>BENGALURU, INDIA</span></div>
-      <motion.h1 className="hero-name-back" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, ease: [.2, .7, .2, 1] }}>TUSHAR HEGDE</motion.h1>
-      <motion.div className="hero-portrait-layer" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.1, delay: .12, ease: [.2, .7, .2, 1] }}>
+      <h1 className="hero-name-back">TUSHAR HEGDE</h1>
+      <div className="hero-portrait-layer">
         <img className="hero-cutout hero-cutout-mood" src="/images/portraits/tushar-moody-cutout.png" alt="Tushar tipping his flat cap" />
         <img className="hero-cutout hero-cutout-thoughtful" src="/images/portraits/tushar-thoughtful-cutout.png" alt="Tushar looking thoughtful, one hand at his chin" />
-      </motion.div>
+      </div>
       <div className="hero-lede">
         <p className="eyebrow"><span className="availability-dot" /> INFORMATION SCIENCE ENGINEER</p>
         <motion.h2 initial={{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }} animate={{ opacity: 1, clipPath: 'inset(0 0% 0 0)' }} transition={{ duration: 1.08, delay: .36, ease: [.72, 0, .2, 1] }}>Welcome to<br /><em>my universe.</em></motion.h2>
@@ -180,29 +193,40 @@ export function ProjectShowcase({ projects, onOpen, reducedMotion, theme = 'dark
 
   useGSAP(() => {
     if (!trackRef.current || !frameRef.current) return;
-    const panels = gsap.utils.toArray<HTMLElement>('.project-slide', trackRef.current);
-    if (reducedMotion || window.matchMedia('(max-width: 720px)').matches) {
+    const mm = gsap.matchMedia(trackRef);
+
+    mm.add('(min-width: 721px) and (prefers-reduced-motion: no-preference)', () => {
+      const panels = gsap.utils.toArray<HTMLElement>('.project-slide', trackRef.current);
+      gsap.set(panels, { autoAlpha: 0 });
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: trackRef.current,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+      panels.forEach((panel, index) => {
+        const circle = panel.querySelector('.project-circle-trigger') as HTMLElement;
+        const story = panel.querySelector('.project-story') as HTMLElement;
+        timeline.set(panel, { autoAlpha: 1 }, index);
+        timeline.fromTo(circle, { scale: .002 }, { scale: 1, duration: .72, ease: 'none' }, index);
+        timeline.fromTo(story, { x: -46, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: .28, ease: 'power2.out' }, index + .24);
+        if (index < panels.length - 1) timeline.to(panel, { autoAlpha: 0, duration: .09, ease: 'none' }, index + .93);
+      });
+    });
+
+    mm.add('(max-width: 720px), (prefers-reduced-motion: reduce)', () => {
+      const panels = gsap.utils.toArray<HTMLElement>('.project-slide', trackRef.current);
       gsap.set(panels, { autoAlpha: 1, clearProps: 'transform' });
-      return;
-    }
-    gsap.set(panels, { autoAlpha: 0 });
-    const timeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: trackRef.current,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 1,
-        invalidateOnRefresh: true,
-      },
+      panels.forEach(panel => {
+        const circle = panel.querySelector('.project-circle-trigger');
+        if (circle) gsap.set(circle, { scale: 1, clearProps: 'transform' });
+      });
     });
-    panels.forEach((panel, index) => {
-      const circle = panel.querySelector('.project-circle-trigger') as HTMLElement;
-      const story = panel.querySelector('.project-story') as HTMLElement;
-      timeline.set(panel, { autoAlpha: 1 }, index);
-      timeline.fromTo(circle, { scale: .002 }, { scale: 1, duration: .72, ease: 'none' }, index);
-      timeline.fromTo(story, { x: -46, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: .28, ease: 'power2.out' }, index + .24);
-      if (index < panels.length - 1) timeline.to(panel, { autoAlpha: 0, duration: .09, ease: 'none' }, index + .93);
-    });
+
+    return () => mm.revert();
   }, { scope: trackRef, dependencies: [projects, reducedMotion], revertOnUpdate: true });
 
   return <section ref={trackRef} style={{ height: `${(Math.max(1, projects.length) + 1) * 100}svh` }} className={`project-showcase${reducedMotion ? ' reduce-motion' : ''}${theme === 'light' ? ' project-showcase-light' : ''}`} aria-label="Selected projects">
@@ -276,6 +300,22 @@ export const DarkPortfolio: React.FC<{ onToggleTheme: () => void }> = ({ onToggl
   }, []);
 
   useEffect(() => {
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      document.fonts.ready.then(() => {
+        ScrollTrigger.refresh();
+      });
+    }
+    const timer = setTimeout(() => ScrollTrigger.refresh(), 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (skillTowerReady) {
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+    }
+  }, [skillTowerReady]);
+
+  useEffect(() => {
     const skillsSection = document.getElementById('skills');
     if (!skillsSection || skillTowerReady) return;
     const observer = new IntersectionObserver(([entry]) => {
@@ -318,14 +358,14 @@ export const DarkPortfolio: React.FC<{ onToggleTheme: () => void }> = ({ onToggl
       <PortraitStory onSeeWork={() => goTo('work')} />
 
       <section className="work-section" id="work">
-        <motion.div className="work-intro" initial="hidden" whileInView="visible" viewport={{ once: true, amount: .3 }} variants={reveal}><p className="eyebrow">A FEW THINGS I’VE MADE</p><h2>Selected<br /><em>work.</em></h2><p className="work-intro-copy">Scroll once. One project takes the whole frame. Keep going to turn the page.</p><span className="work-intro-orb" aria-hidden="true" /></motion.div>
+        <motion.div className="work-intro" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={reveal}><p className="eyebrow">A FEW THINGS I’VE MADE</p><h2>Selected<br /><em>work.</em></h2><p className="work-intro-copy">Scroll once. One project takes the whole frame. Keep going to turn the page.</p><span className="work-intro-orb" aria-hidden="true" /></motion.div>
         <div className="work-controls"><div className="work-filters" role="group" aria-label="Filter projects">{(['All', 'Data & AI', 'Systems'] as const).map(filter => <button key={filter} className={projectFilter === filter ? 'filter-button active' : 'filter-button'} onClick={() => setProjectFilter(filter)}>{filter}</button>)}</div><span>{String(visibleProjects.length).padStart(2, '0')} PROJECTS / OPEN ANY TO READ THE NOTES</span></div>
         <ProjectShowcase projects={visibleProjects} onOpen={setSelectedProject} reducedMotion={Boolean(reduceMotion)} />
       </section>
 
       <section className="photo-notes section-wrap" aria-labelledby="photo-notes-title">
         <div className="photo-notes-top">
-          <motion.div className="photo-notes-copy" initial="hidden" whileInView="visible" viewport={{ once: true, amount: .3 }} variants={reveal}>
+          <motion.div className="photo-notes-copy" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={reveal}>
             <p className="eyebrow">OUTSIDE THE BUILD LOG</p>
             <h2 id="photo-notes-title">A few frames<br />from <em>my world.</em></h2>
             <p>Outside the projects, there’s the rest of me. Music, late-night code, games, and the quiet moments between things.</p>
@@ -355,14 +395,14 @@ export const DarkPortfolio: React.FC<{ onToggleTheme: () => void }> = ({ onToggl
       </section>
 
       <section className="journey-section section-wrap" id="journey">
-        <motion.div className="section-heading" initial="hidden" whileInView="visible" viewport={{ once: true, amount: .3 }} variants={reveal}><div><p className="eyebrow">JOURNEY SO FAR</p><h2>Still learning.<br /><em>Still making.</em></h2></div><p className="section-aside">A few turning points on the way from studying systems to building them.</p></motion.div>
+        <motion.div className="section-heading" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={reveal}><div><p className="eyebrow">JOURNEY SO FAR</p><h2>Still learning.<br /><em>Still making.</em></h2></div><p className="section-aside">A few turning points on the way from studying systems to building them.</p></motion.div>
         <div className="journey-line"><article><span>2022 — 2026</span><h3>Information Science</h3><p>B.E. at SDM Institute of Technology. Foundations in software, data systems, and the discipline of breaking hard things into smaller ones.</p></article><article><span>2026</span><h3>Technical Intern</h3><p>Castle Rock. First-hand experience taking engineering work from a brief into a working product.</p></article><article className="journey-now"><span>RIGHT NOW</span><h3>Looking for the next problem</h3><p>Building practical AI and data projects, sharpening fundamentals, and ready to join a team that cares about what it ships.</p></article></div>
       </section>
 
-      <section className="about-section section-wrap" id="about"><motion.div className="about-lead" initial="hidden" whileInView="visible" viewport={{ once: true, amount: .3 }} variants={reveal}><p className="eyebrow">A LITTLE ABOUT ME</p><h2>Same roots.<br /><em>Bigger vision.</em></h2><p className="about-side-note">The work is technical.<br />The reason is human.</p></motion.div><motion.div className="about-body" initial="hidden" whileInView="visible" viewport={{ once: true, amount: .3 }} variants={reveal}><p className="about-bio">{profileData.bio}</p><div className="about-facts"><div><span>EDUCATION</span><strong>{profileData.education.degree}</strong><p>{profileData.education.institution} · {profileData.education.period}</p></div><div><span>EXPERIENCE</span><strong>{profileData.experience.role} · {profileData.experience.company}</strong><p>{profileData.experience.period} · {profileData.experience.status}</p></div></div><div className="personal-notes"><p className="eyebrow">A FEW THINGS I COME BACK TO</p><details><summary>Understand the whole system <span>+</span></summary><p>Small decisions make more sense when I understand what they connect to—data, people, and the work around them.</p></details><details><summary>Keep the first version honest <span>+</span></summary><p>A prototype should expose what we still don’t know. That’s more useful than polishing a guess.</p></details><details><summary>Leave things clearer <span>+</span></summary><p>Good engineering makes the next decision easier, whether that’s a teammate’s or a user’s.</p></details></div><a href="/Tushar.v4.pdf" target="_blank" rel="noreferrer" className="text-link">View résumé <ArrowUpRight size={15} /></a></motion.div></section>
+      <section className="about-section section-wrap" id="about"><motion.div className="about-lead" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={reveal}><p className="eyebrow">A LITTLE ABOUT ME</p><h2>Same roots.<br /><em>Bigger vision.</em></h2><p className="about-side-note">The work is technical.<br />The reason is human.</p></motion.div><motion.div className="about-body" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={reveal}><p className="about-bio">{profileData.bio}</p><div className="about-facts"><div><span>EDUCATION</span><strong>{profileData.education.degree}</strong><p>{profileData.education.institution} · {profileData.education.period}</p></div><div><span>EXPERIENCE</span><strong>{profileData.experience.role} · {profileData.experience.company}</strong><p>{profileData.experience.period} · {profileData.experience.status}</p></div></div><div className="personal-notes"><p className="eyebrow">A FEW THINGS I COME BACK TO</p><details><summary>Understand the whole system <span>+</span></summary><p>Small decisions make more sense when I understand what they connect to—data, people, and the work around them.</p></details><details><summary>Keep the first version honest <span>+</span></summary><p>A prototype should expose what we still don’t know. That’s more useful than polishing a guess.</p></details><details><summary>Leave things clearer <span>+</span></summary><p>Good engineering makes the next decision easier, whether that’s a teammate’s or a user’s.</p></details></div><a href="/Tushar.v4.pdf" target="_blank" rel="noreferrer" className="text-link">View résumé <ArrowUpRight size={15} /></a></motion.div></section>
 
       <section className="skills-section section-wrap" id="skills">
-        <motion.div className="section-heading" initial="hidden" whileInView="visible" viewport={{ once: true, amount: .3 }} variants={reveal}><div><p className="eyebrow">THE PRACTICE / TOOLS & APPROACH</p><h2>Think clearly.<br /><em>Build early.</em></h2></div><p className="section-aside">I like to get the rough version working early. A real prototype makes the unknowns visible and gives the team something concrete to improve.</p></motion.div>
+        <motion.div className="section-heading" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={reveal}><div><p className="eyebrow">THE PRACTICE / TOOLS & APPROACH</p><h2>Think clearly.<br /><em>Build early.</em></h2></div><p className="section-aside">I like to get the rough version working early. A real prototype makes the unknowns visible and gives the team something concrete to improve.</p></motion.div>
         <div className="practice-grid"><article><span>01 / UNDERSTAND</span><h3>Start with the problem.</h3><p>Trace the user, the data, and the real constraint before reaching for a model or framework.</p></article><article><span>02 / MAKE</span><h3>Make it tangible.</h3><p>Build a small working slice. Test assumptions in code and let the behavior guide the design.</p></article><article><span>03 / REFINE</span><h3>Keep what works.</h3><p>Measure the result, simplify the rough edges, and leave the system easier to extend.</p></article></div>
         <div className="skill-game-stage">
         <div className="toolkit-heading"><div><span>THE THINGS I BUILD WITH</span><p>Build a stack, one skill at a time.</p></div><span className="toolkit-note">A SMALL STACK / BUILT ONE PIECE AT A TIME</span></div>
