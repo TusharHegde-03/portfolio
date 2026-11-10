@@ -80,7 +80,7 @@ function PortraitStory({ onSeeWork }: { onSeeWork: () => void }) {
     if (!storyRef.current || !stageRef.current) return;
     const mm = gsap.matchMedia(storyRef);
 
-    mm.add('(min-width: 721px) and (prefers-reduced-motion: no-preference)', () => {
+    mm.add('(min-width: 721px)', () => {
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: storyRef.current,
@@ -102,10 +102,9 @@ function PortraitStory({ onSeeWork }: { onSeeWork: () => void }) {
         .to('.hero-scroll-bio', { x: 0, autoAlpha: 1, ease: 'none' }, .64);
     });
 
-    mm.add('(max-width: 720px), (prefers-reduced-motion: reduce)', () => {
-      gsap.set(['.hero-scroll-left', '.hero-scroll-bio', '.hero-hotspots', '.hero-cutout-thoughtful'], {
-        autoAlpha: 1,
-        clearProps: 'transform',
+    mm.add('(max-width: 720px)', () => {
+      gsap.set(['.hero-name-back', '.hero-portrait-layer', '.hero-lede', '.hero-scroll-left', '.hero-scroll-bio'], {
+        clearProps: 'all',
       });
     });
 
@@ -195,7 +194,7 @@ export function ProjectShowcase({ projects, onOpen, reducedMotion, theme = 'dark
     if (!trackRef.current || !frameRef.current) return;
     const mm = gsap.matchMedia(trackRef);
 
-    mm.add('(min-width: 721px) and (prefers-reduced-motion: no-preference)', () => {
+    mm.add('(min-width: 721px)', () => {
       const panels = gsap.utils.toArray<HTMLElement>('.project-slide', trackRef.current);
       gsap.set(panels, { autoAlpha: 0 });
       const timeline = gsap.timeline({
@@ -217,12 +216,14 @@ export function ProjectShowcase({ projects, onOpen, reducedMotion, theme = 'dark
       });
     });
 
-    mm.add('(max-width: 720px), (prefers-reduced-motion: reduce)', () => {
+    mm.add('(max-width: 720px)', () => {
       const panels = gsap.utils.toArray<HTMLElement>('.project-slide', trackRef.current);
       gsap.set(panels, { autoAlpha: 1, clearProps: 'transform' });
       panels.forEach(panel => {
         const circle = panel.querySelector('.project-circle-trigger');
         if (circle) gsap.set(circle, { scale: 1, clearProps: 'transform' });
+        const story = panel.querySelector('.project-story');
+        if (story) gsap.set(story, { autoAlpha: 1, clearProps: 'transform' });
       });
     });
 

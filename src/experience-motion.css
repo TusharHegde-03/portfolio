@@ -305,23 +305,26 @@
   .portfolio-shell .skill-game-stage { padding-left: 3vw; padding-right: 3vw; }
 }
 @media (max-width: 720px) {
-  .portfolio-shell .site-header { position: relative; height: 66px; padding: 0 20px; }
+  .portfolio-shell .site-header { position: sticky; top: 0; z-index: 80; height: 62px; padding: 0 16px; background: #090909f0; backdrop-filter: blur(14px); }
+  .portfolio-shell .header-actions { gap: 10px; margin-left: auto; }
+  .portfolio-shell .header-contact { font-size: 0.625rem; }
+  .portfolio-shell .theme-toggle { padding: 4px 8px; font-size: 0.5625rem; }
   .portfolio-shell .hero-scroll { height: auto; padding: 0; }
-  .portfolio-shell .hero-stage { position: relative; top: auto; display: flex; flex-direction: column; height: auto; min-height: 0; overflow: hidden; padding: 56px 20px 26px; }
+  .portfolio-shell .hero-stage { position: relative; top: auto; display: flex; flex-direction: column; height: auto; min-height: 0; overflow: hidden; padding: 42px 20px 26px; }
   .portfolio-shell .hero-stage::after { background: linear-gradient(0deg,#090909eF,transparent 60%); }
-  .portfolio-shell .hero-topline { top: 16px; right: 20px; left: 20px; font-size: 0.5625rem; }
-  .portfolio-shell .hero-name-back { position: relative; top: auto; left: auto; z-index: 4; width: 100%; margin: 19px 0 -16px; font-size: clamp(4.0625rem,13.4vw,6.25rem); line-height: .76; white-space: normal; text-align: left; }
-  .portfolio-shell .hero-portrait-layer { position: relative; z-index: 2; top: auto; bottom: auto; left: 4%; width: 96%; height: 88vw; min-height: 310px; max-height: 520px; margin-top: 22px; overflow: visible; transform: none; }
+  .portfolio-shell .hero-topline { top: 14px; right: 20px; left: 20px; font-size: 0.5625rem; }
+  .portfolio-shell .hero-name-back { position: relative; top: auto; left: auto; z-index: 4; width: 100%; margin: 14px 0 0; font-size: clamp(2.75rem,11.5vw,4.5rem); line-height: .88; white-space: normal; text-align: left; }
+  .portfolio-shell .hero-portrait-layer { position: relative; z-index: 2; top: auto; bottom: auto; left: 0; width: 100%; height: 85vw; min-height: 290px; max-height: 480px; margin-top: 18px; overflow: visible; transform: none; }
   .portfolio-shell .hero-portrait-layer .hero-cutout { object-position: center top; }
   .portfolio-shell .hero-portrait-layer .hero-cutout-mood { display: none; }
-  .portfolio-shell .hero-portrait-layer .hero-cutout-thoughtful { top: 8%; height: 92%; opacity: 1; }
-  .portfolio-shell .hero-lede { position: relative; z-index: 5; bottom: auto; left: auto; width: 100%; margin-top: 25px; }
+  .portfolio-shell .hero-portrait-layer .hero-cutout-thoughtful { top: 4%; height: 96%; opacity: 1; }
+  .portfolio-shell .hero-lede { position: relative; z-index: 5; bottom: auto; left: auto; width: 100%; margin-top: 22px; }
   .portfolio-shell .hero-lede h2 { font-size: clamp(2.3125rem,9vw,3.25rem); }
   .portfolio-shell .hero-lede > p:last-of-type { max-width: 100%; font-size: 0.6875rem; }
   .portfolio-shell .hero-scroll-left { position: relative; top: auto; left: auto; width: 100%; margin-top: 30px; opacity: 1; visibility: visible; transform: none; }
   .portfolio-shell .hero-scroll-left p { font-size: 1.875rem; }
   .portfolio-shell .hero-scroll-bio { position: relative; top: auto; right: auto; width: 100%; margin-top: 30px; opacity: 1; visibility: visible; transform: none; }
-  .portfolio-shell .hero-hotspots { inset: 110px 0 auto; height: 88vw; min-height: 310px; opacity: 1; visibility: visible; }
+  .portfolio-shell .hero-hotspots { display: none !important; }
   .portrait-mark-lines { display: none; }
   .portrait-annotation { width: min(145px,37vw); padding: 3px 5px; }
   .portrait-annotation-1 { top: 28%; left: 0; }
@@ -330,25 +333,25 @@
   .annotation-label { font-size: 0.9375rem; }
   .annotation-note { font-size: 0.625rem; }
   .portfolio-shell .hero-bottomline { position: relative; right: auto; bottom: auto; left: auto; margin-top: 25px; font-size: 0.5625rem; }
-  .portfolio-shell .work-intro { min-height: 57svh; align-items: stretch; padding: 80px 22px 32px; text-align: left; }
-  .portfolio-shell .work-intro .eyebrow { margin-bottom: 24px; }
-  .portfolio-shell .work-intro h2 { font-size: clamp(5rem,19vw,8.25rem); }
+  .portfolio-shell .work-intro { min-height: 45svh; align-items: stretch; padding: 60px 22px 28px; text-align: left; }
+  .portfolio-shell .work-intro .eyebrow { margin-bottom: 20px; }
+  .portfolio-shell .work-intro h2 { font-size: clamp(4rem,16vw,7rem); }
   .portfolio-shell .work-intro-copy { max-width: 310px; margin-left: auto; font-size: 0.625rem; }
   .portfolio-shell .work-controls { width: calc(100% - 42px); align-items: flex-start; padding: 8px 0; }
   .portfolio-shell .work-controls > span { font-size: 0.5625rem; }
   .portfolio-shell .project-showcase { height: auto !important; overflow: visible; padding: 14px 0 24px; }
-  .portfolio-shell .project-showcase-frame { position: relative; top: auto; display: grid; height: auto; min-height: 0; overflow: visible; gap: 12px; }
-  .portfolio-shell .project-slide, .portfolio-shell .project-slide:first-child { position: relative; inset: auto; height: 640px; min-height: 640px; visibility: visible !important; opacity: 1 !important; border-top: 1px solid #ffffff30; }
-  .portfolio-shell .project-circle-trigger { top: 36%; left: 50%; width: 220vw; height: 220vw; transform: translate(-50%,-50%) scale(1); }
+  .portfolio-shell .project-showcase-frame { position: relative; top: auto; display: grid; height: auto; min-height: 0; overflow: visible; gap: 16px; }
+  .portfolio-shell .project-slide, .portfolio-shell .project-slide:first-child { position: relative; inset: auto; height: 580px; min-height: 580px; visibility: visible !important; opacity: 1 !important; border-top: 1px solid #ffffff30; }
+  .portfolio-shell .project-circle-trigger { top: 34%; left: 50%; width: 150vw; height: 150vw; transform: translate(-50%,-50%) scale(1); pointer-events: none; }
   .portfolio-shell .project-circle { border-color: #e2303c; }
   .art-masthead { top: 8%; right: 7%; left: 7%; font-size: 0.5625rem; }
-  .portfolio-shell .project-story { top: auto; bottom: 55px; left: 21px; width: min(83%,390px); transform: none; }
+  .portfolio-shell .project-story { top: auto; bottom: 45px; left: 20px; width: min(88%,390px); transform: none; }
   .portfolio-shell .project-story h3 { margin: 12px 0 9px; font-size: clamp(1.625rem,8vw,2.4375rem); }
   .portfolio-shell .project-story p { font-size: 0.625rem; line-height: 1.68; }
   .portfolio-shell .project-story .project-first-feature { margin-top: 8px; font-size: 0.5625rem; }
   .portfolio-shell .project-story .project-tags { margin-top: 11px; }
   .portfolio-shell .project-story .project-tags span { font-size: 0.5625rem; }
-  .portfolio-shell .project-read { margin-top: 15px; }
+  .portfolio-shell .project-read { margin-top: 15px; pointer-events: auto; }
   .portfolio-shell .project-slide-coordinate { left: 21px; bottom: 16px; font-size: 0.5625rem; }
   .portfolio-shell .project-frame-counter { display: none; }
   .art-display-word { right: 6%; bottom: 13%; font-size: clamp(3.375rem,14vw,5.375rem); }
@@ -375,6 +378,7 @@
   .portfolio-shell .skill-game-stage .skills-layout { height: auto; margin: 0; }
   .portfolio-shell .skill-game { min-height: 800px; grid-template-columns: 1fr; grid-template-rows: minmax(380px,48svh) 1fr; }
   .portfolio-shell .skill-game-canvas { border-right: 0; border-bottom: 1px solid #ffffff35; }
+  .portfolio-shell .skill-game-canvas canvas { touch-action: pan-y !important; }
   .portfolio-shell .game-skill-panel { min-height: 390px; padding: 54px 22px 58px; }
   .portfolio-shell .game-panel-top { left: 22px; right: 22px; top: 18px; font-size: 0.5625rem; }
   .portfolio-shell .game-skill-panel h3 { font-size: clamp(2.25rem,10vw,3.375rem); }
